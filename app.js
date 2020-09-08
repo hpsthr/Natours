@@ -8,6 +8,7 @@ const mongoSanitize = require("express-mongo-sanitize")
 const compression = require("compression")
 const xss = require("xss-clean")
 const hpp = require("hpp")
+const cors = require("cors")
 const toursRouter = require('./routers/toursRouter')
 const bookingRouter = require('./routers/bookingRouter')
 const userRouter = require('./routers/userRoutes')
@@ -22,11 +23,15 @@ const cookieParser = require('cookie-parser');
 const app = express();
 
 app.enable('trust proxy')
+
 app.set("view engine", "pug")
 app.set("views", path.join(__dirname, 'views'))
 app.use(express.static(path.join( __dirname, "public")))
 app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended: true}))
+app.use(cors()) // allow all cross  domain requests for our api
+app.option("*", cors()); // it allow to all route that pass cross domain/planform request
+
 
 
 app.use(helmet())
