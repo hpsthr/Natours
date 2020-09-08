@@ -22,16 +22,15 @@ const signToken = id => jwt.sign({
     expiresIn: process.env.JWT_EXPIRES_IN
 })
 
- const tokenHandler = (user, statusCode, res, message) => {
+ const tokenHandler = (user, statusCode, req, res, message) => {
     const token = signToken(user._id)
     const cookieOptions = {
         expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
-        httpOnly: true
+        httpOnly: true,
+        secure: req.secure || req.headers("x-forwarded-proto") === "https"
     }
-    if (process.env.NODE_ENV === "production") cookieOptions.secure = true
-
-
     res.cookie('jwt', token, cookieOptions)
+     
     user.password = undefined;
     if (user.verificationToken) {
         user.verificationToken = undefined;
@@ -82,7 +81,7 @@ exports.signup =
         const verifiedURL = `${req.protocol}://${req.get("host")}/verifyuser/${verificationToken}`
         try {
             await new Email(verUser, verifiedURL).sendVerification()
-            tokenHandler(verUser, 201, res, "verification link has sended to your account")
+            tokenHandler(verUser, 201, req, res, "verification link has sended to your account")
 
         } catch (err) {
             verUser.verificationToken = undefined;
@@ -113,7 +112,7 @@ exports.login = errorCatch(async (req, res, next) => {
     if (!user || !(await user.authPass(password, user.password))) {
         return next(new errHandling("incorrect username and password", 401))
     }
-    tokenHandler(user, 201, res, "")
+    tokenHandler(user, 201, req, res, "")
 
 })
 
@@ -200,7 +199,7 @@ next()
 })
 
 exports.confirmVerification = (req, res, next) => {
-   tokenHandler(verifiedEmail, 201, res, "you verified this email ")
+   tokenHandler(verifiedEmail, 201, req, res, "you verified this email ")
     
 }
 
@@ -274,7 +273,7 @@ exports.resetPassword = errorCatch(async (req, res, next) => {
         resetUser.passwordResetTime = undefined
 
     await resetUser.save()
-    tokenHandler(resetUser, 201, res, "")
+    tokenHandler(resetUser, 201, req, res, "")
 });
 
 
@@ -287,7 +286,7 @@ exports.updatePassword = errorCatch(async (req, res, next) => {
     user.passwordConfirm = req.body.passwordConfirm
     await user.save()
 
-    tokenHandler(user, 200, res, "Password update successfully")
+    tokenHandler(user, 200, req, res, "Password update successfully")
 
 
 })
