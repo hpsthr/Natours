@@ -1,0 +1,116 @@
+extends base
+
+block append head
+    script(src="https://checkout.razorpay.com/v1/checkout.js")
+    
+    
+
+mixin liBox(link, icon, name, active)
+    li(class=`${active ? "side-nav--active": ""}`)
+        a(href= `${link}`)
+            svg
+                use(xlink:href=`/img/icons.svg#icon-${icon}`)
+            span= name      
+        
+
+block content
+    main.main
+        .user-view
+            nav.user-view__menu
+                ul.side-nav
+                    +liBox("/me", "settings", "Setting", )
+                    +liBox("/mybooking", "briefcase", "My Booking")
+                    +liBox("myreview", "star", "My Review")
+                    +liBox("#", "bar-chart", "Billing")
+                    +liBox("/mycart", "shopping-cart", "My Cart", true)
+
+                        
+                -if (users.role === "admin")
+                    .admin-nav
+                        h5.admin-nav__heading Admin
+                        ul.side-nav
+                            +liBox("#", "map", "Manage Tour")
+                            +liBox("#", "users", "Manage Users")
+                            +liBox("#", "star", "Manage reviews")
+                            +liBox("#", "briefcase", "Manage Booking")
+                    
+                            
+
+            .user-view__content
+                .cart-view__form-container
+                    
+                    each tour in users.cart
+                        .cart--box-user
+                            
+                               
+                            .cart--in-box 
+                                .cart-box-1
+                                    h1.cart-name= tour.tour.name
+                                    img.cart-img(src=`/img/tours/${tour.tour.imageCover}`)
+                                .cart-box-2
+                                    .box--1
+                                        .head-cart
+                                            
+                                            h2.cart-head Duration
+                                            h2.cart-head Difficulty
+                                            h2.cart-head Group Size
+                                            h2.cart-head Price
+                                            h2.cart-head Description
+                                    .box--2
+                                        .head-cart
+                                            h2.cart-head= `${tour.tour.duration} Days`
+                                            h2.cart-head= tour.tour.difficulty
+                                            h2.cart-head= tour.tour.maxGroupSize
+                                            h2.cart-head= `$ ${tour.tour.price}`
+                                            h2.cart-head= (tour.tour.description).slice(0,100)
+                                                span ...
+                            .cart-btn
+                                .cart-abs
+                                    button.btn.cart-rmv(data-tour-id= `${tour.tour.id}`) Remove 
+                    -if(user.cart.length !== 0)
+                        .cart-checkout
+                            .checkout--box
+                                .check--1
+                                    .tour--box
+                                        h2.cart-btm ITEM
+                                        each tour in users.cart
+                                            h2=tour.tour.name
+                                        
+                                .check--2
+                                    .tour--box
+                                        h2.cart-btm QUNTITY
+                                        each tour in users.cart
+                                            .increse-decrese
+                                                button.cart--minus.cart-dec(data-tour-id= `${tour.tour.id}`) -
+                                                h2.cart--item-box= tour.item
+                                                button.cart--plus.cart-inc(data-tour-id= `${tour.tour.id}`) +
+                                                
+                                                
+                                .check--3
+                                    .tour--box
+                                        h2.cart-btm PRICE
+                                        each tour in users.cart
+                                            h2= tour.item*tour.tour.price
+
+                                        
+                            .total--box
+                                .total--box-in
+                                    .total-float-left
+                                        h2 TOTAL
+                                    .total-float-right
+                                        -let total = 0
+                                        -users.cart.forEach(el => total += el.item*el.tour.price)
+                                        h2=total
+                            .cart-btn
+                                .cart-abs.bttm
+                                    button.btn#checkout-btn CheckOUt
+                    -else 
+                        .cart-empty
+                            h1 Your Cart Is Empty
+                            //- img.cart-img(src=`/img/tours/${tour.imageCover}`)
+        if users
+            p.hidden--element= users.email
+
+
+                            
+                    

@@ -1,0 +1,27 @@
+extends base
+
+
+
+block content
+    main.main
+        .review-box
+            .review-box-header
+                .review__picture
+                        .card__picture-overlay(style="border-radius:9px 9px 0 0 ") ;
+                        img.card__picture-img(src= `/img/tours/${tour.imageCover}`, alt=`${tour.name}` style="border-radius:9px 9px 0 0 ")
+                .review__heading
+                    h1.review-name= tour.name
+            .review-box-middle
+                .review-star-head
+                    h1 Overall Rating
+                    .reviews__rating
+                        each star , i  in [1,2,3,4,5]
+                            span.size-icon.review-star
+                                i.far.fa-star.fa-4x(data-value = `${i + 1}`)
+                    
+                .review-star-mid
+                    h1 Write About Tour
+                    .review__review
+                        textarea.review_text(name = "review")
+                    .review_btn
+                        button.btn.btn--green.span-all-rows#edit-review(data-tour-id= `${tour.id}` data-user-id= `${user.id}`) Edit Review

@@ -1,0 +1,83 @@
+extends base
+
+block append head
+    script(src="https://checkout.razorpay.com/v1/checkout.js")
+    
+    
+
+mixin liBox(link, icon, name, active)
+    li(class=`${active ? "side-nav--active": ""}`)
+        a(href= `${link}`)
+            svg
+                use(xlink:href=`/img/icons.svg#icon-${icon}`)
+            span= name      
+        
+
+block content
+    main.main
+        .user-view
+            nav.user-view__menu
+                ul.side-nav
+                    +liBox("/me", "settings", "Setting", )
+                    +liBox("/mybooking", "briefcase", "My Booking", true)
+                    +liBox("myreview", "star", "My Review")
+                    +liBox("#", "bar-chart", "Billing")
+                    +liBox("/mycart", "shopping-cart", "My Cart")
+
+                        
+                -if (users.role === "admin")
+                    .admin-nav
+                        h5.admin-nav__heading Admin
+                        ul.side-nav
+                            +liBox("#", "map", "Manage Tour")
+                            +liBox("#", "users", "Manage Users")
+                            +liBox("#", "star", "Manage reviews")
+                            +liBox("#", "briefcase", "Manage Booking")
+                    
+                            
+
+            .user-view__content
+                .cart-view__form-container
+                    each order in booking
+                        .book--box-user
+                            .book-header
+                                .book-box-1
+                                    .book-i-1
+                                        h2 order date
+                                        h2= new Date(parseInt(order.receipt,10)).toLocaleDateString('en-IN',{month:'long', year:'numeric', day:'numeric'})
+                                    .book-i-1
+                                        h2 Total
+                                        h2= `${order.amount / 100}.00`
+                                    .book-i-1
+                                        h2 Order By
+                                        h2= order.user.name
+                                    
+                                .book-box-2
+                                    h2= order.order_id
+                                    
+                            .book-middle
+                                each items in order.item
+                                    .book-list-row
+                                        .book-item-box
+                                            h2= items.tour.name
+                                        .book-item-box(style="text-align:center; width:6%")
+                                            h2= items.item
+                                        .book-item-box(style="text-align:center; ")
+                                            a.review-link(href=`/write-review/${items.tour.id}`) Post Review
+                                        .book-item-box(style="text-align:center ")
+                                            -if (items.startDates)
+                                                h2= items.startDates.toLocaleString('en-us',{month:"long", year:"numeric"})
+                                            -else
+                                                h2 No updates 
+                                        .book-item-box(style="text-align:right; width:15%; ")
+                                            h2= `${items.tour.price * items.item}.00`
+                                        
+                            
+                        
+                            
+        if users
+            p.hidden--element= users.email
+
+
+                            
+                    

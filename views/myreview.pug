@@ -1,0 +1,56 @@
+extends base
+
+mixin liBox(link, icon, name, active)
+    li(class=`${active ? "side-nav--active": ""}`)
+        a(href= `${link}`)
+            svg
+                use(xlink:href=`/img/icons.svg#icon-${icon}`)
+            = name      
+
+mixin reviewsUser(review)
+    .reviews__card_user
+        .review-box-header
+            .review__picture
+                .card__picture-overlay(style="border-radius:9px 9px 0 0 ") ;
+                img.card__picture-img(src= `/img/tours/${review.tour.imageCover}`, alt=`${review.tour.name}` style="border-radius:9px 9px 0 0 ")
+            .review__heading
+                h1.review-name= review.tour.name
+        p.reviews__text= review.review
+        .reviews__rating
+            each star in [1,2,3,4,5]
+                svg.reviews__star(class=`reviews__star--${review.rating >= star ? "active":"inactive"}`)
+                    use(xlink:href='/img/icons.svg#icon-star')
+        .btn__space
+            .tour-btn
+                a.btn.btn--green.btn--small(href=`/tours/${review.tour.slug}`) Go to Tour
+            .edit-btn
+                a.btn.btn--green.btn--small(href=`/edit-review/${review.tour.id}`) Edit Review
+        
+
+block content
+    main.main
+        .user-view
+            nav.user-view__menu
+                ul.side-nav
+                    +liBox("/me", "settings", "Setting")
+                    +liBox("/mybooking", "briefcase", "My Booking")
+                    +liBox("/myreview", "star", "My Review", true)
+                    +liBox("#", "bar-chart", "Billing")
+                    +liBox("/mycart", "shopping-cart", "My Cart")
+                        
+                -if (users.role === "admin")
+                    .admin-nav
+                        h5.admin-nav__heading Admin
+                        ul.side-nav
+                            +liBox("#", "map", "Manage Tour")
+                            +liBox("#", "users", "Manage Users")
+                            +liBox("#", "star", "Manage reviews")
+                            +liBox("#", "briefcase", "Manage Booking")
+                    
+                            
+
+            .user-view__content
+                .user-view__form-container
+                   each review in reviews
+                        +reviewsUser(review)
+                
