@@ -3,12 +3,12 @@ const dotenv = require('dotenv').config({
 })
 const app = require('./app')
 
-const mode = process.env.NODE_ENV
 
-let port = process.env.PORT || 8080
+
+let port = process.env.PORT 
 
 const server = app.listen(port, () => {
-    console.log("server has started on port " + port + " @ "+ mode+ " mode")
+    console.log("server has started on port " + port + " @ mode")
 
 })
 
