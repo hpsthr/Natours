@@ -20,3 +20,10 @@ process.on('unhandledRejection', err => {
     } )
     
 })
+
+process.on("SIGTERM", () => {
+    console.log("System is Halting connection");
+    server.close( () => {
+    console.log("this halting")
+    })
+})
